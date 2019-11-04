@@ -6,15 +6,17 @@ const S3 = new AWS.S3({
 })
 
 const Sharp = require('sharp')
+const BUCKET = 'gehna-storage'
 const QUALITY = 75
 
 exports.handler = async (event, context, callback) => {
-  const BUCKET = process.env.S3_IMAGE_CONVERSION_BUCKET
   const { request, response } = event.Records[0].cf
   const { uri } = request
   const headers = response.headers
 
   if (path.extname(uri) === '.webp') {
+    console.log(response)
+    console.log(request)
     if (parseInt(response.status) === 404) {
       const format = request.headers['original-resource-type'] && request.headers['original-resource-type'][0]
         ? request.headers['original-resource-type'][0].value.replace('image/', '')

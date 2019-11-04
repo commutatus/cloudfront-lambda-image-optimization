@@ -5,7 +5,7 @@ Resources:
   ViewerRequestFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://docker-sharp/viewer-request-function-1.zip
+      CodeUri: s3://lambda-image-conversion/gehna-prod/viewer-request-function.zip
       Handler: handler.handler
       Runtime: nodejs10.x
       MemorySize: 128
@@ -21,15 +21,12 @@ Resources:
   OriginResponseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://docker-sharp/origin-response-function.zip
+      CodeUri: s3://lambda-image-conversion/gehna-prod/origin-response-function.zip
       Handler: handler.handler
       Runtime: nodejs10.x
       MemorySize: 512
       Timeout: 5
       Role: !GetAtt WebEdgeLambdaRole.Arn
-      Environment:
-        Variables:
-          S3_IMAGE_CONVERSION_BUCKET: 'gehna-storage-staging'
 
   OriginResponseFunctionVersion:
     Type: "AWS::Lambda::Version"
