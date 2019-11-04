@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Rewrite jpg and png requests to webp if the browser supports webp
+Resources:
+  ViewerRequestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://docker-sharp/viewer-request-function-1.zip
+      Handler: handler.handler
+      Runtime: nodejs10.x
+      MemorySize: 128
+      Timeout: 1
+      Role: !GetAtt WebEdgeLambdaRole.Arn
+
+  ViewerRequestFunctionVersion:
+    Type: "AWS::Lambda::Version"
+    Properties:
+      FunctionName: !Ref ViewerRequestFunction
+      Description: "A version of ViewerRequestFunction"
+
+  OriginResponseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://docker-sharp/origin-response-function.zip
+      Handler: handler.handler
+      Runtime: nodejs10.x
+      MemorySize: 512
+      Timeout: 5
+      Role: !GetAtt WebEdgeLambdaRole.Arn
+      Environment:
+        Variables:
+          S3_IMAGE_CONVERSION_BUCKET: 'gehna-storage-staging'
+
+  OriginResponseFunctionVersion:
+    Type: "AWS::Lambda::Version"
+    Properties:
+      FunctionName: !Ref OriginResponseFunction
+      Description: "A version of OriginResponseFunction"
+
+  # ==== ROLES ==== #
+  WebEdgeLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - "edgelambda.amazonaws.com"
+  # ==== POLICIES ==== #
+  PublishLogsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows functions to write logs
+      Roles:
+      - !Ref WebEdgeLambdaRole
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: '*'
