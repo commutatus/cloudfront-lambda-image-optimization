@@ -6,7 +6,7 @@ const S3 = new AWS.S3({
 })
 
 const Sharp = require('sharp')
-const BUCKET = 'gehna-storage'
+const BUCKET = 'gehna-storage-staging'
 const QUALITY = 75
 
 exports.handler = async (event, context, callback) => {
@@ -24,18 +24,20 @@ exports.handler = async (event, context, callback) => {
 
       const key = uri.substring(1)
       const s3key = key.replace('.webp', `.${format}`)
-
+      console.log("Printing key:", key)
+      console.log("Printing S3key", s3key)
       try {
-        const bucketResource = await S3.getObject({ Bucket: BUCKET, Key: s3key }).promise()
+        const bucketResource = await S3.getObject({ Bucket: BUCKET, Key: decodeURI(s3key) }).promise()
         const sharpImageBuffer = await Sharp(bucketResource.Body)
           .webp({ quality: +QUALITY })
           .toBuffer()
+        console.log("Got the S3 image and converted. Trying to put it into S3")
         await S3.putObject({
           Body: sharpImageBuffer,
           Bucket: BUCKET,
           ContentType: 'image/webp',
           CacheControl: 'max-age=31536000',
-          Key: key,
+          Key: decodeURI(key),
           StorageClass: 'STANDARD'
         }).promise()
 
