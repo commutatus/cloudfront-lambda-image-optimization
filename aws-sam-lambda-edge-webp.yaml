@@ -5,7 +5,8 @@ Resources:
   ViewerRequestFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://lambda-image-conversion/gehna-staging/viewer-request-function.zip
+      CodeUri: s3://lambda-compressed-file-storage/viewer-request-function.zip
+      FunctionName: ViewerRequestFunction
       Handler: handler.handler
       Runtime: nodejs10.x
       MemorySize: 128
@@ -21,7 +22,8 @@ Resources:
   OriginResponseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://lambda-image-conversion/gehna-staging/origin-response-function.zip
+      CodeUri: s3://lambda-compressed-file-storage/origin-response-function.zip
+      FunctionName: OriginResponseFunction
       Handler: handler.handler
       Runtime: nodejs10.x
       MemorySize: 512
