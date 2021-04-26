@@ -113,6 +113,11 @@ exports.handler = async (event, context, callback) => {
     console.log('Final Request if params not present', request)
 
     return callback(null, request);
+  } else {
+    request.headers['dimensionIncluded'] = [{
+      key: 'dimensionIncluded',
+      value: 'false'
+    }]
   }
   console.log("Not inside the browser")
   return callback(null, request)
